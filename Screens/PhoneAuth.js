@@ -10,18 +10,12 @@ import {
     Alert,
     Dimensions
 } from 'react-native';
-// import * as Animatable from 'react-native-animatable';
-// import LinearGradient from 'react-native-linear-gradient';
-// import FontAwesome from 'react-native-vector-icons/FontAwesome';
-// import Feather from 'react-native-vector-icons/Feather';
-// import { LoginSvgOne } from './assets/SubtlePrismSvg'
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 import _ from 'lodash';
-// import Loader from '../Loader'
+import Loader from './Loader'
 
-
-const { height, width } = Dimensions.get('screen')
+//const { height, width } = Dimensions.get('screen')
 
 const PhoneAuth = ({navigation}) => {
 
@@ -30,7 +24,6 @@ const PhoneAuth = ({navigation}) => {
     const [code, setCode] = useState('')
     const [isValidPhoneText, setIsValidPhoneText] = useState('Null')
     const [check_textInputChange,setCheck_textInputChange] = useState(false)
-    const [userAccount, setUserAccount] = useState(false)
     const [loading, setLoading] = useState(false)
     const [textInfo,setTextInfo] = useState('Loading...')
     const [forget,setForget] = useState(false)
@@ -68,6 +61,25 @@ const PhoneAuth = ({navigation}) => {
 
          setLoading(true)
         setTextInfo('checking phone no...')
+        // const isUserPhoneNumberLinked = await getIsUserPhoneNumberLinked(
+        //     phoneNumber
+        //   );
+        //   if (!isUserPhoneNumberLinked) {
+      
+        //   } else {
+        //       console.log('check this')
+        //     // try {
+        //     // //   let confirmationResult = await firebase
+        //     // //     .auth()
+        //     // //     .signInWithPhoneNumber(phoneNumber, true);
+      
+        //     // //   Promise.resolve();
+        //     // //   setIsSmsCodeSent(true);
+        //     // //   confirmationRef.current = confirmationResult;
+        //     // } catch (error) {
+        //     //   throw error;
+        //     // }
+        //   }
 
         await database().ref('UsersList/').once('value', async(snapshot) => {
 
@@ -78,7 +90,6 @@ const PhoneAuth = ({navigation}) => {
                 }
             })
             console.log(found) 
-           
 
                 if(found)
                 {
@@ -109,32 +120,16 @@ const PhoneAuth = ({navigation}) => {
                         phoneAuthUser(phone)
                     }
                 }
-                
-           
         })
-     
-        
     }
-   // if(forget){
-        //     if(useraccount){
-        //         //forget password & user exist (login here)
-        //     }else{
-        //         //did forget password & user not exist
-        //     }    
-        // }else{
-        //     //first time user
-        //     if(useraccount){
-        //         //entered phone no. of other account
-        //     }else{
-        //         //new user (login here)
-        //     }
-        // }
 
  
     const phoneAuthUser=async()=>{
-        console.log('phone auth function')
+
+            console.log('phone auth function')
         await auth().signInWithPhoneNumber('+91'+phone)
         .then(data => {
+            Promise.resolve();
             setConfirm(data);
             // console.log(data)
             // console.log(data.verificationId)
@@ -155,7 +150,7 @@ const PhoneAuth = ({navigation}) => {
                 setLoading(false)
             }
             console.log(error)
-        })
+        }) 
     }
 
 
@@ -213,6 +208,7 @@ const PhoneAuth = ({navigation}) => {
                         Alert.alert('Error!', "Check verification code.", [
                             {text: 'Okay'}
                             ])
+                            setLoading(false)
                         } else {
                         Alert.alert('Error!', "error.", [
                             {text: 'Okay'}
@@ -228,6 +224,7 @@ const PhoneAuth = ({navigation}) => {
                     console.log('Invalid code.');
                     setLoading(false)
                 } else {
+                    setLoading(false)
                     console.log('Account linking error');
                 }
             }
@@ -237,42 +234,26 @@ const PhoneAuth = ({navigation}) => {
     return (
       <View style={styles.container}>
         <StatusBar backgroundColor='#2e86c1' barStyle="light-content"/>
-        {/* <Loader loading={loading} textInfo={textInfo}/> */}
+        <Loader loading={loading} textInfo={textInfo}/>
 
         <View style={styles.header}>
             <Text style={styles.text_header}>Phone no. authentication!</Text>
         </View>
-        {/* <Animatable.View 
-            animation="fadeInUpBig"
-            style={[styles.footer, {
-               // backgroundColor: "#fff"
-            }]}
-            > */}
-            {/* <View style={{bottom:-20}}>
-                <LoginSvgOne width={width*1} height={height*0.15} color={'#fff'} ></LoginSvgOne>
-            </View> */}
+       
 
             <View style={styles.footernew}> 
-{/* {console.log('confirm',confirm)} */}
             {confirm?
                 <View>
                     <Text style={[styles.text_footer, {
                         marginTop: 35
                     }]}>Code</Text>
                     <View style={styles.action}>
-                        {/* <Feather 
-                            name="lock"
-                    //     color={colors.text}
-                            size={20}
-                        /> */}
+                      
                     <TextInput 
                         placeholder="Enter Code"
                         placeholderTextColor="#666666"
                         keyboardType="phone-pad"
-                        //secureTextEntry={data.secureTextEntry ? true : false}
-                        style={[styles.textInput, {
-                    //       color: colors.text
-                        }]}
+                        style={styles.textInput}
                         autoCapitalize="none"
                         onChangeText={(val) => {setCode(val)}}
                     />
@@ -280,63 +261,28 @@ const PhoneAuth = ({navigation}) => {
                 </View>:<>
                 <Text style={styles.text_footer}>Phone no.</Text>
                 <View style={styles.action}>
-                    {/* <FontAwesome 
-                        name="user-o"
-                        // color={colors.text}
-                        size={20}
-                    /> */}
+                  
                     <TextInput 
                         placeholder="Enter phone number"
                         placeholderTextColor="#666666"
                         keyboardType="phone-pad"
-                        style={[styles.textInput, {
-                          //  color: colors.text
-                        }]}
+                        style={styles.textInput}
                         autoCapitalize="none"
                         onChangeText={(val) => textInputChange(val)}
-                       // onEndEditing={(e)=>handleValidUser(e.nativeEvent.text)}
                     />
-                    {/* {check_textInputChange ? 
-                        // <Animatable.View
-                        //     animation="bounceIn"
-                        // >
-                            <Feather 
-                                name="check-circle"
-                                color="green"
-                                size={20}
-                            />
-                        // </Animatable.View>
+                    {check_textInputChange ? 
+                        <Text>&#10003;</Text>
                         : null
-                    } */}
+                    }
                 </View>
 
                 </>}
-                
-
-
-
+      
 
                {isValidPhoneText==='Null'?null:
-                    // <Animatable.View animation="fadeInLeft" duration={500}>
                         <Text style={styles.errorMsg}>{isValidPhoneText}</Text>
-                    // </Animatable.View>
                     }
-                
-            
-       
-               
           
-
-
-
-
-
-
-
-
-
-
-
 
             <View style={styles.button}>
                 {confirm?
@@ -354,17 +300,13 @@ const PhoneAuth = ({navigation}) => {
                     </TouchableOpacity>
                     :
                     <TouchableOpacity
-                        style={styles.signIn}
+                        style={[styles.signIn,{borderColor: '#2e86c1',
+                        borderWidth: 1,}]}
                         onPress={() => {loginHandle( phone)}}
                     >
-                        {/* <LinearGradient
-                            colors={['#87CEEB', '#2e86c1']}
-                            style={styles.signIn}
-                        > */}
                             <Text style={[styles.textSign, {
-                                color:'#000'
+                                color:'#2e86c1'
                             }]}>Send code</Text>
-                        {/* </LinearGradient> */}
                     </TouchableOpacity>
                 }
                 
@@ -372,7 +314,6 @@ const PhoneAuth = ({navigation}) => {
                 
             </View>
             </View>
-        {/* </Animatable.View> */}
       </View>
     );
 };
@@ -389,15 +330,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingBottom: 0
     },
-    footer: {
-        flex: 5,
-        backgroundColor: 'transparent',
-        // borderTopLeftRadius: 30,
-        // borderTopRightRadius: 30,
-     //   paddingHorizontal: 0,
-         padding: 0,
-         margin: 0
-    },
+    
     footernew: {
       flex: 1,
       backgroundColor: '#fff',
@@ -421,13 +354,6 @@ const styles = StyleSheet.create({
         marginTop: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#f2f2f2',
-        paddingBottom: 5
-    },
-    actionError: {
-        flexDirection: 'row',
-        marginTop: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#FF0000',
         paddingBottom: 5
     },
     textInput: {

@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "545222347576",
+    "firebase_url": "https://attendance-1e171-default-rtdb.firebaseio.com",
     "project_id": "attendance-1e171",
     "storage_bucket": "attendance-1e171.appspot.com"
   },
@@ -13,14 +14,6 @@
         }
       },
       "oauth_client": [
-        {
-          "client_id": "545222347576-d1qh1e7v9mjdm1mbco9n8r586mv4cg2r.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.attendance",
-            "certificate_hash": "ffb4a5ae39af0156a27911aa0c1394834b95e991"
-          }
-        },
         {
           "client_id": "545222347576-9d5emfanuqgdp7td1vf9s5o3eqf3jb7h.apps.googleusercontent.com",
           "client_type": 3

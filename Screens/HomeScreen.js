@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text,StatusBar,Dimensions, StyleSheet,Button,Alert,TouchableOpacity } from "react-native";
+import { View, Text,FlatList,Dimensions, StyleSheet,Button,Alert,TouchableOpacity } from "react-native";
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 import _ from 'lodash';
@@ -68,9 +68,14 @@ refresh = () =>{
         .ref('UsersList/' + auth()._user.uid )
         .once('value')
         .then(snapshot => {
+            // let tempSessions = _.map(snapshot.val().sessions, (e) => {
+            //     return e
+            // })
             this.setState({name:snapshot.val().name,sessions:snapshot.val().sessions})
           snapshot.val().sessions[this.state.ThisDay][this.state.time]?this.setState({registered:true}):this.setState({registered:false})
           
+            
+
         })
         setTimeout(() => {
             this.setState({
@@ -104,25 +109,36 @@ refresh = () =>{
     }
 
 
+    renderItem = ({ item }) => (
+        <View>
+        <Text>{console.log(item)}
+        </Text>
+        </View>
+      );
+
 
     render() {
         return (
+            <>
+            
+
             <View style={styles.container}>
-                <Loader loading={this.state.loading} />
-                <View style={{display:'flex',marginBottom:40,marginVertical:10}}>
+            <Loader loading={this.state.loading} textInfo={'Loading...'}/>
+
+                <View style={{display:'flex',marginBottom:40,marginVertical:20}}>
                     <Text style={styles.welcome}>Welcome {this.state.name}!</Text>
                 </View>
                 <View style={{backgroundColor:"#fff",width:width*0.9,paddingVertical:10, alignSelf:"center",borderRadius:20,alignItems:"center",justifyContent:"center"}}>
-                
+               
                 
                 {this.state.disableButton?null:<>
                     {this.state.registered?
-                    <Text style={{fontSize:20,marginVertical:20}}>Your attendance is marked for{'\n'}
-                        <Text>{this.state.timeInterval}</Text>
+                    <Text style={{fontSize:20,marginVertical:20,textAlign:'center'}}>Your attendance is marked for{'\n'}
+                        <Text style={{fontWeight:'bold'}}>{this.state.timeInterval}</Text>
                     </Text>
                     :<>
-                        <Text style={{fontSize:20,marginVertical:20}}>Mark your Attendance for{'\n'}
-                            <Text>{this.state.timeInterval}</Text>
+                        <Text style={{fontSize:20,marginVertical:20,textAlign:'center'}}>Mark your Attendance for{'\n'}
+                            <Text style={{fontWeight:'bold'}}>{this.state.timeInterval}</Text>
                         </Text>
                         <TouchableOpacity 
                             onPress={() => this.AddToday()}
@@ -140,11 +156,14 @@ refresh = () =>{
 
                 
                 
-
                 </View>
-                
-                   
+                <FlatList
+        data={this.state.sessions}
+        renderItem={this.renderItem}
+        keyExtractor={item => item.id}
+      />
             </View>
+            </>
         );
     }
 }
@@ -153,9 +172,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         width:width,
- //       justifyContent: "center",
-    //    alignItems: "center",
-   //     alignSelf:"center",
+
         backgroundColor:'#d3edf8'
     },
     welcome: {
